@@ -1,0 +1,19 @@
+{
+  "name": "trie-d",
+  "version": "1.0.0",
+  "description": "Minimal trie datastructure representation",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/void666/node-trie.git"
+  },
+  "author": "Sushim Mukul Dutta",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/void666/node-trie/issues"
+  },
+  "homepage": "https://github.com/void666/node-trie#readme"
+}
