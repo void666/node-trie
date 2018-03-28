@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/void666/node-trie/issues"
   },
-  "homepage": "https://github.com/void666/node-trie#readme"
+  "homepage": "https://github.com/void666/node-trie#readme",
+  "dependencies": {
+    "lodash": "^4.17.5"
+  }
 }
