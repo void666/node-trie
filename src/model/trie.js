@@ -12,6 +12,21 @@ class Trie {
      * undefined : treats '' as delimiter.
      * @param delimiter
      */
+
+    _splitByCount(str, count) {
+        if (_.isEmpty(str) || !count || count <= 0) {
+            return [];
+        }
+        let res = [];
+        let start = 0;
+        while (start < str.length) {
+            let temp = str.substr(start, count);
+            res.push(temp);
+            start += count;
+        }
+        return res;
+    }
+
     constructor(delimiter) {
         if (delimiter) {
             this.has_delimiter = true;
@@ -23,7 +38,7 @@ class Trie {
                 }
                 Error.invalidDelimiter(delimiter);
             }
-            else if (typeof delimiter === 'String') {
+            else if (typeof delimiter === 'string') {
                 this.delimiter = delimiter.toString();
                 this.delimeter_type = CONSTANT.STR_MATCH;
             }
@@ -56,11 +71,17 @@ class Trie {
             return;
         }
         if (node.getNode(values[0])) {
+            if (values.length === 1) {
+                node.getNode(values[0]).markWord();
+            }
             return this._addValueToNode(node.getNode(values[0]), values.splice(1));
         }
         else {
             let n = new Node(values[0]);
             node.setNode(n);
+            if (values.length === 1) {
+                n.markWord();
+            }
             return this._addValueToNode(n, values.splice(1));
         }
     }
@@ -76,7 +97,7 @@ class Trie {
             const delimiterType = this._getDelimiterType();
             const delimiter = this._getDelimiter();
             if (delimiterType === CONSTANT.COUNT_MATCH) {
-                values = _.chunk(_.toArray(value), delimiter);
+                values = this._splitByCount(value, delimiter);
             }
             else if (delimiterType === CONSTANT.STR_MATCH) {
                 values = value.split(delimiter);
@@ -107,82 +128,10 @@ class Trie {
         }
     }
 
-    /*getExactMatch(node, values) {
-     if (_.isEmpty(values)) {
-     return false;
-     }
-     let key = values[0];
-     if (node.getNode(key)) {
-     if (values.length === 1) {
-     return true;
-     }
-     return this.getExactMatch(node.getNode(key), values.splice(1));
-     }
-     else {
-     return false;
-     }
-     }
-
-     /!**
-     * returns if element is present or not.
-     * @param value
-     * @return {*}
-     *!/
-     exactSearch(value) {
-     if (_.isEmpty(value)) {
-     return false;
-     }
-     let values = [];
-     let firstKey;
-     if (this._hasDelimiter()) {
-     const delimiterType = this._getDelimiterType();
-     const delimiter = this._getDelimiter();
-     if (delimiterType === CONSTANT.COUNT_MATCH) {
-     values = _.chunk(_.toArray(value), delimiter);
-     }
-     else if (delimiterType === CONSTANT.STR_MATCH) {
-     values = value.split(delimiter);
-     }
-     firstKey = values[0];
-     if (this._getFirstLevelMap()[firstKey]) {
-     return this.getExactMatch(this._getFirstLevelMap()[firstKey], values.splice(1));
-     }
-     else {
-     return false;
-     }
-     }
-     else {
-     values = value.split('');
-     firstKey = values[0];
-     if (this._getFirstLevelMap()[firstKey]) {
-     return this.getExactMatch(this._getFirstLevelMap()[firstKey], values.splice(1));
-     }
-     else {
-     return false;
-     }
-     }
-     }
-     */
-    getNearMatch(result, node, values, prefix) {
-        if (node === null) {
-            return result;
-        }
-        if (_.isEmpty(values)) {
-            if (node.isLeaf()) {
-                return result;
-            }
-            else {
-                return this._getAllNextValues(result, node, prefix);
-            }
-        }
-        let key = values[0];
-        result.push(prefix + key);
-        if (node.getNode(key)) {
-            return this.getNearMatch(result, node.getNode(key), values.splice(1), prefix + key);
-        }
-        else {
-            return result;
-        }
+    _getText(currPrefix, nextKey) {
+        let delimiter = this._getDelimiter() || '';
+        nextKey = nextKey? nextKey : '';
+        return currPrefix + delimiter + nextKey;
     }
 
     _getAllNextValues(result, node, prefix) {
@@ -191,15 +140,41 @@ class Trie {
         }
         const keys = _.keys(node.getMap());
         _.each(keys, (key) => {
-            result.push(prefix + key);
-            result = _.union(result, this._getAllNextValues(result, node.getNode(key), prefix + key));
+            if (node.getNode(key).getWordMark()) {
+                result.push(this._getText(prefix, key));
+            }
+            result = _.union(result, this._getAllNextValues(result, node.getNode(key), this._getText(prefix, key)));
         });
         return _.uniq(result);
     }
 
+    getNearMatch(result, node, values, prefix) {
+        // console.log(result, node, values, prefix);
+        if (_.isEmpty(values)) {
+            if (node.getWordMark()) {
+                result.push(this._getText(prefix));
+            }
+            return this._getAllNextValues(result, node, prefix);
+        }
+        let key = values[0];
+        let nextNode = node.getNode(key);
+        if (nextNode) {
+            if (nextNode.isLeaf()) {
+                result.push();
+                return result;
+            }
+            else {
+                return this.getNearMatch(result, nextNode, values.splice(1), this._getText(prefix, key));
+            }
+        }
+        else {
+            return result;
+        }
+    }
+
     nearMatch(value) {
         if (_.isEmpty(value)) {
-            return;
+            return [];
         }
         let values = [];
         let firstKey;
@@ -207,7 +182,7 @@ class Trie {
             const delimiterType = this._getDelimiterType();
             const delimiter = this._getDelimiter();
             if (delimiterType === CONSTANT.COUNT_MATCH) {
-                values = _.chunk(_.toArray(value), delimiter);
+                values = this._splitByCount(value, delimiter);
             }
             else if (delimiterType === CONSTANT.STR_MATCH) {
                 values = value.split(delimiter);
@@ -215,7 +190,7 @@ class Trie {
             firstKey = values[0];
             if (this._getFirstLevelMap()[firstKey]) {
                 let result = this.getNearMatch([], this._getFirstLevelMap()[firstKey], values.splice(1), firstKey);
-                return _.uniq(result);
+                return result;
             }
             else {
                 return [];
@@ -232,7 +207,6 @@ class Trie {
                 return [];
             }
         }
-
     }
 }
 

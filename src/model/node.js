@@ -3,6 +3,7 @@ const _ = require('lodash');
 class Node {
     constructor(key) {
         this.key = key;
+        this.mark_word = false;
         this.map = {};
     }
 
@@ -22,9 +23,18 @@ class Node {
         return _.isEmpty(this.map);
     }
 
+    markWord() {
+        this.mark_word = true;
+    }
+
+    getWordMark() {
+        return this.mark_word;
+    }
+
     getMap() {
         return this.map;
     }
+
 }
 
 module.exports = Node;
