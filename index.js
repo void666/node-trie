@@ -2,8 +2,8 @@
 const Trie = require('./src/model/trie');
 
 var run = function () {
-    var t = new Trie(' ');
-   /* t.add('abc');
+    var t = new Trie();
+    t.add('abc');
     t.add('abcd');
     t.add('abcdef');
     t.add('abcdefgh');
@@ -18,14 +18,14 @@ var run = function () {
     t.add('naa');
     console.log(JSON.stringify(t));
     console.log(t.nearMatch('a'));
-    console.log(t.nearMatch('sushi'));
-    console.log(t.nearMatch('naa'));*/
-    t.add('this');
+    console.log(t.nearMatch('sushim'));
+    console.log(t.nearMatch('nabc'));
+    /*t.add('this');
     t.add('this is');
     t.add('this is fucked');
     t.add('this is fucked up');
     console.log(JSON.stringify(t));
-    console.log(t.nearMatch('this is'));
+    console.log(t.nearMatch('this is'));*/
 };
 
 

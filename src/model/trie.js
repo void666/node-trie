@@ -128,12 +128,6 @@ class Trie {
         }
     }
 
-    _getText(currPrefix, nextKey) {
-        let delimiter = this._getDelimiter() || '';
-        nextKey = nextKey? nextKey : '';
-        return currPrefix + delimiter + nextKey;
-    }
-
     _getAllNextValues(result, node, prefix) {
         if (node.isLeaf()) {
             return result;
@@ -141,9 +135,9 @@ class Trie {
         const keys = _.keys(node.getMap());
         _.each(keys, (key) => {
             if (node.getNode(key).getWordMark()) {
-                result.push(this._getText(prefix, key));
+                result.push(prefix + key);
             }
-            result = _.union(result, this._getAllNextValues(result, node.getNode(key), this._getText(prefix, key)));
+            result = _.union(result, this._getAllNextValues(result, node.getNode(key), prefix + key));
         });
         return _.uniq(result);
     }
@@ -152,7 +146,7 @@ class Trie {
         // console.log(result, node, values, prefix);
         if (_.isEmpty(values)) {
             if (node.getWordMark()) {
-                result.push(this._getText(prefix));
+                result.push(prefix);
             }
             return this._getAllNextValues(result, node, prefix);
         }
@@ -160,11 +154,11 @@ class Trie {
         let nextNode = node.getNode(key);
         if (nextNode) {
             if (nextNode.isLeaf()) {
-                result.push();
+                result.push(prefix + key);
                 return result;
             }
             else {
-                return this.getNearMatch(result, nextNode, values.splice(1), this._getText(prefix, key));
+                return this.getNearMatch(result, nextNode, values.splice(1), prefix + key);
             }
         }
         else {
