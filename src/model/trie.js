@@ -34,34 +34,34 @@ class Trie {
         this.first_level_map = {};
     }
 
-    getFirstLevelMap() {
+    _getFirstLevelMap() {
         return this.first_level_map;
     }
 
 
-    hasDelimiter() {
+    _hasDelimiter() {
         return this.has_delimiter;
     }
 
-    getDelimiterType() {
+    _getDelimiterType() {
         return this.delimeter_type;
     }
 
-    getDelimiter() {
+    _getDelimiter() {
         return this.delimiter;
     }
 
-    addValueToNode(node, values) {
+    _addValueToNode(node, values) {
         if (_.isEmpty(values)) {
             return;
         }
         if (node.getNode(values[0])) {
-            return this.addValueToNode(node.getNode(values[0]), values.splice(1));
+            return this._addValueToNode(node.getNode(values[0]), values.splice(1));
         }
         else {
             let n = new Node(values[0]);
             node.setNode(n);
-            return this.addValueToNode(n, values.splice(1));
+            return this._addValueToNode(n, values.splice(1));
         }
     }
 
@@ -69,11 +69,12 @@ class Trie {
         if (_.isEmpty(value)) {
             return;
         }
+        value = _.toLower(value);
         let values = [];
         let firstKey;
-        if (this.hasDelimiter()) {
-            const delimiterType = this.getDelimiterType();
-            const delimiter = this.getDelimiter();
+        if (this._hasDelimiter()) {
+            const delimiterType = this._getDelimiterType();
+            const delimiter = this._getDelimiter();
             if (delimiterType === CONSTANT.COUNT_MATCH) {
                 values = _.chunk(_.toArray(value), delimiter);
             }
@@ -81,90 +82,98 @@ class Trie {
                 values = value.split(delimiter);
             }
             firstKey = values[0];
-            if (this.getFirstLevelMap()[firstKey]) {
+            if (this._getFirstLevelMap()[firstKey]) {
                 let firstNode = this.first_level_map[firstKey];
-                return this.addValueToNode(firstNode, values.splice(1));
+                return this._addValueToNode(firstNode, values.splice(1));
             }
             else {
                 let n = new Node(firstKey);
                 this.first_level_map[n.getKey()] = n;
-                return this.addValueToNode(n, values.splice(1));
+                return this._addValueToNode(n, values.splice(1));
             }
         }
         else {
             values = value.split('');
             firstKey = values[0];
-            if (this.getFirstLevelMap()[firstKey]) {
+            if (this._getFirstLevelMap()[firstKey]) {
                 let firstNode = this.first_level_map[firstKey];
-                return this.addValueToNode(firstNode, values.splice(1));
+                return this._addValueToNode(firstNode, values.splice(1));
             }
             else {
                 let n = new Node(firstKey);
-                this.getFirstLevelMap()[n.getKey()] = n;
-                return this.addValueToNode(n, values.splice(1));
+                this._getFirstLevelMap()[n.getKey()] = n;
+                return this._addValueToNode(n, values.splice(1));
             }
         }
     }
 
-    getExactMatch(node, values) {
-        if (_.isEmpty(values)) {
-            return true;
-        }
-        let key = values[0];
-        if (node.getNode(key)) {
-            if (values.length === 1) {
-                return true;
-            }
-            return this.getExactMatch(node.getNode(key), values.splice(1));
-        }
-        else {
-            return false;
-        }
-    }
+    /*getExactMatch(node, values) {
+     if (_.isEmpty(values)) {
+     return false;
+     }
+     let key = values[0];
+     if (node.getNode(key)) {
+     if (values.length === 1) {
+     return true;
+     }
+     return this.getExactMatch(node.getNode(key), values.splice(1));
+     }
+     else {
+     return false;
+     }
+     }
 
-    /**
+     /!**
      * returns if element is present or not.
      * @param value
      * @return {*}
+     *!/
+     exactSearch(value) {
+     if (_.isEmpty(value)) {
+     return false;
+     }
+     let values = [];
+     let firstKey;
+     if (this._hasDelimiter()) {
+     const delimiterType = this._getDelimiterType();
+     const delimiter = this._getDelimiter();
+     if (delimiterType === CONSTANT.COUNT_MATCH) {
+     values = _.chunk(_.toArray(value), delimiter);
+     }
+     else if (delimiterType === CONSTANT.STR_MATCH) {
+     values = value.split(delimiter);
+     }
+     firstKey = values[0];
+     if (this._getFirstLevelMap()[firstKey]) {
+     return this.getExactMatch(this._getFirstLevelMap()[firstKey], values.splice(1));
+     }
+     else {
+     return false;
+     }
+     }
+     else {
+     values = value.split('');
+     firstKey = values[0];
+     if (this._getFirstLevelMap()[firstKey]) {
+     return this.getExactMatch(this._getFirstLevelMap()[firstKey], values.splice(1));
+     }
+     else {
+     return false;
+     }
+     }
+     }
      */
-    exactSearch(value) {
-        if (_.isEmpty(value)) {
-            return false;
-        }
-        let values = [];
-        let firstKey;
-        if (this.hasDelimiter()) {
-            const delimiterType = this.getDelimiterType();
-            const delimiter = this.getDelimiter();
-            if (delimiterType === CONSTANT.COUNT_MATCH) {
-                values = _.chunk(_.toArray(value), delimiter);
-            }
-            else if (delimiterType === CONSTANT.STR_MATCH) {
-                values = value.split(delimiter);
-            }
-            firstKey = values[0];
-            if (this.getFirstLevelMap()[firstKey]) {
-                return this.getExactMatch(this.getFirstLevelMap()[firstKey], values.splice(1));
-            }
-            else {
-                return false;
-            }
-        }
-        else {
-            values = value.split('');
-            firstKey = values[0];
-            if (this.getFirstLevelMap()[firstKey]) {
-                return this.getExactMatch(this.getFirstLevelMap()[firstKey], values.splice(1));
-            }
-            else {
-                return false;
-            }
-        }
-    }
-
     getNearMatch(result, node, values, prefix) {
-        if (_.isEmpty(values) || node === null) {
+        if (node === null) {
             return result;
+        }
+        if (_.isEmpty(values)) {
+            if (node.isLeaf()) {
+                return result;
+            }
+            else {
+                return this._getAllNextValues(result, node, prefix);
+            }
         }
         let key = values[0];
         result.push(prefix + key);
@@ -176,15 +185,27 @@ class Trie {
         }
     }
 
+    _getAllNextValues(result, node, prefix) {
+        if (node.isLeaf()) {
+            return result;
+        }
+        const keys = _.keys(node.getMap());
+        _.each(keys, (key) => {
+            result.push(prefix + key);
+            result = _.union(result, this._getAllNextValues(result, node.getNode(key), prefix + key));
+        });
+        return _.uniq(result);
+    }
+
     nearMatch(value) {
         if (_.isEmpty(value)) {
             return;
         }
         let values = [];
         let firstKey;
-        if (this.hasDelimiter()) {
-            const delimiterType = this.getDelimiterType();
-            const delimiter = this.getDelimiter();
+        if (this._hasDelimiter()) {
+            const delimiterType = this._getDelimiterType();
+            const delimiter = this._getDelimiter();
             if (delimiterType === CONSTANT.COUNT_MATCH) {
                 values = _.chunk(_.toArray(value), delimiter);
             }
@@ -192,8 +213,8 @@ class Trie {
                 values = value.split(delimiter);
             }
             firstKey = values[0];
-            if (this.getFirstLevelMap()[firstKey]) {
-                let result = this.getNearMatch([], this.getFirstLevelMap()[firstKey], values.splice(1), firstKey);
+            if (this._getFirstLevelMap()[firstKey]) {
+                let result = this.getNearMatch([], this._getFirstLevelMap()[firstKey], values.splice(1), firstKey);
                 return _.uniq(result);
             }
             else {
@@ -203,8 +224,8 @@ class Trie {
         else {
             values = value.split('');
             firstKey = values[0];
-            if (this.getFirstLevelMap()[firstKey]) {
-                let result = this.getNearMatch([], this.getFirstLevelMap()[firstKey], values.splice(1), firstKey);
+            if (this._getFirstLevelMap()[firstKey]) {
+                let result = this.getNearMatch([], this._getFirstLevelMap()[firstKey], values.splice(1), firstKey);
                 return _.uniq(result);
             }
             else {

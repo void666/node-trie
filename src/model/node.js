@@ -1,4 +1,5 @@
 'use strict';
+const _ = require('lodash');
 class Node {
     constructor(key) {
         this.key = key;
@@ -17,11 +18,12 @@ class Node {
         return this.map[node.getKey()] = node;
     }
 
-    nodeStatus() {
-        const keys = keys(this.map);
-        return keys.forEach((key) => {
-            console.log(`Key ${key}`);
-        });
+    isLeaf() {
+        return _.isEmpty(this.map);
+    }
+
+    getMap() {
+        return this.map;
     }
 }
 
