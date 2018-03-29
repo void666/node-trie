@@ -14,6 +14,15 @@ class Node {
     }
 
     setNode(node) {
-        return this.map[node.getKey()];
+        return this.map[node.getKey()] = node;
+    }
+
+    nodeStatus() {
+        const keys = keys(this.map);
+        return keys.forEach((key) => {
+            console.log(`Key ${key}`);
+        });
     }
 }
+
+module.exports = Node;
