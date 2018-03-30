@@ -204,7 +204,7 @@ class Trie {
             firstKey = values[0];
             if (this._getFirstLevelMap()[firstKey]) {
                 let result = this.getNearMatch([], this._getFirstLevelMap()[firstKey], values.splice(1), firstKey);
-                return result;
+                return result.sort(this._lexi);
             }
             else {
                 return [];
@@ -215,7 +215,7 @@ class Trie {
             firstKey = values[0];
             if (this._getFirstLevelMap()[firstKey]) {
                 let result = this.getNearMatch([], this._getFirstLevelMap()[firstKey], values.splice(1), firstKey);
-                return result;
+                return result.sort(this._lexi);
             }
             else {
                 return [];
@@ -234,6 +234,10 @@ class Trie {
         _.each(ele, (e) => {
             this.add(e);
         });
+    }
+
+    _lexi(a, b) {
+        return a.toString().localeCompare(b);
     }
 }
 

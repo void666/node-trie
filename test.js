@@ -20,7 +20,7 @@ var run = function () {
     t.addAll(['abc', 'abcd', 'abcdef', 'abcdefgh', 'abcdefg', 'abcf', 'abcaad', 'ab', 'Sushim', 'sus', 'N', 'nabc',
     'afg', 'naa']);
     console.log(JSON.stringify(t));
-    console.log(t.nearMatch('a'));
+    console.log(t.nearMatch('ab'));
     console.log(t.nearMatch('sushim'));
     console.log(t.nearMatch('na'));
     /*t.add('this');
