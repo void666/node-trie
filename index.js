@@ -7,27 +7,13 @@ const Error = new ErrorClass();
 
 class Trie {
     /**
+     * Props {delimiter}
      * Delimiter supports String, Positive Integer and undefined.
      * Positive Integer : delimits provided data by number of character count.
      * String(s) : sets up as the that string or regex as the delimiter
      * undefined : treats '' as delimiter.
-     * @param delimiter
+     * @param  props = { delimiter = 'str' || 1 || undefined }
      */
-
-    _splitByCount(str, count) {
-        if (_.isEmpty(str) || !count || count <= 0) {
-            return [];
-        }
-        const res = [];
-        let start = 0;
-        while (start < str.length) {
-            const temp = str.substr(start, count);
-            res.push(temp);
-            start += count;
-        }
-        return res;
-    }
-
     constructor(props) {
         let delimiter = _.get(props, 'delimiter');
         if (delimiter) {
@@ -37,8 +23,7 @@ class Trie {
                 if (delimiter >= 1) {
                     this.delimeter_type = CONSTANT.COUNT_MATCH;
                     this.delimiter = delimiter;
-                }
-                else {
+                } else {
                     Error.invalidDelimiter(delimiter);
                 }
             } else if (typeof delimiter === 'string') {
@@ -149,8 +134,8 @@ class Trie {
         return result;
     }
 
-    getNearMatch(result, node, values, prefix) {
-        // console.log('getNearMatch', result, node, values, prefix);
+    _getNearMatch(result, node, values, prefix) {
+        // console.log('_getNearMatch', result, node, values, prefix);
         if (_.isEmpty(values)) {
             if (node.getWordMark()) {
                 result.push(this._getText(prefix));
@@ -159,15 +144,11 @@ class Trie {
         }
         const key = values[0];
         const nextNode = node.getNode(key);
-        if (nextNode) {
-            if (nextNode.isLeaf()) {
-                result.push(this._getText(prefix, key));
-                return result;
-            } else {
-                return this.getNearMatch(result, nextNode, values.splice(1), this._getText(prefix, key));
-            }
-        } else {
+        if (nextNode.isLeaf()) {
+            result.push(this._getText(prefix, key));
             return result;
+        } else {
+            return this._getNearMatch(result, nextNode, values.splice(1), this._getText(prefix, key));
         }
     }
 
@@ -191,7 +172,7 @@ class Trie {
             firstKey = values[0];
         }
         if (this._getFirstLevelMap()[firstKey]) {
-            const result = this.getNearMatch([], this._getFirstLevelMap()[firstKey], values.splice(1), firstKey);
+            const result = this._getNearMatch([], this._getFirstLevelMap()[firstKey], values.splice(1), firstKey);
             return result.sort(this._lexi);
         } else {
             return [];
@@ -209,6 +190,24 @@ class Trie {
         _.each(elements, ele => {
             this.add(ele);
         });
+    }
+
+    /** ***************************************************************
+     * utilities
+     *****************************************************************/
+
+    _splitByCount(str, count) {
+        if (_.isEmpty(str) || !count || count <= 0) {
+            return [];
+        }
+        const res = [];
+        let start = 0;
+        while (start < str.length) {
+            const temp = str.substr(start, count);
+            res.push(temp);
+            start += count;
+        }
+        return res;
     }
 
     _lexi(curr, next) {
