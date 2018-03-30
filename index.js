@@ -18,33 +18,34 @@ class Trie {
         if (_.isEmpty(str) || !count || count <= 0) {
             return [];
         }
-        let res = [];
+        const res = [];
         let start = 0;
         while (start < str.length) {
-            let temp = str.substr(start, count);
+            const temp = str.substr(start, count);
             res.push(temp);
             start += count;
         }
         return res;
     }
 
-    constructor(delimiter) {
+    constructor(props) {
+        let delimiter = _.get(props, 'delimiter');
         if (delimiter) {
             this.has_delimiter = true;
-            if (typeof delimiter === 'Number') {
+            if (typeof delimiter === 'number') {
                 delimiter = parseInt(delimiter);
                 if (delimiter >= 1) {
                     this.delimeter_type = CONSTANT.COUNT_MATCH;
                     this.delimiter = delimiter;
                 }
-                Error.invalidDelimiter(delimiter);
-            }
-            else if (typeof delimiter === 'string') {
+                else {
+                    Error.invalidDelimiter(delimiter);
+                }
+            } else if (typeof delimiter === 'string') {
                 this.delimiter = delimiter.toString();
                 this.delimeter_type = CONSTANT.STR_MATCH;
             }
-        }
-        else {
+        } else {
             this.has_delimiter = false;
         }
         this.first_level_map = {};
@@ -77,14 +78,13 @@ class Trie {
                 node.getNode(values[0]).markWord();
             }
             return this._addValueToNode(node.getNode(values[0]), values.splice(1));
-        }
-        else {
-            let n = new Node(values[0]);
-            node.setNode(n);
+        } else {
+            const newNode = new Node(values[0]);
+            node.setNode(newNode);
             if (values.length === 1) {
-                n.markWord();
+                newNode.markWord();
             }
-            return this._addValueToNode(n, values.splice(1));
+            return this._addValueToNode(newNode, values.splice(1));
         }
     }
 
@@ -100,33 +100,21 @@ class Trie {
             const delimiter = this._getDelimiter();
             if (delimiterType === CONSTANT.COUNT_MATCH) {
                 values = this._splitByCount(value, delimiter);
-            }
-            else if (delimiterType === CONSTANT.STR_MATCH) {
+            } else if (delimiterType === CONSTANT.STR_MATCH) {
                 values = value.split(delimiter);
             }
             firstKey = values[0];
-            if (this._getFirstLevelMap()[firstKey]) {
-                let firstNode = this.first_level_map[firstKey];
-                return this._addValueToNode(firstNode, values.splice(1));
-            }
-            else {
-                let n = new Node(firstKey);
-                this.first_level_map[n.getKey()] = n;
-                return this._addValueToNode(n, values.splice(1));
-            }
-        }
-        else {
+        } else {
             values = value.split('');
             firstKey = values[0];
-            if (this._getFirstLevelMap()[firstKey]) {
-                let firstNode = this.first_level_map[firstKey];
-                return this._addValueToNode(firstNode, values.splice(1));
-            }
-            else {
-                let n = new Node(firstKey);
-                this._getFirstLevelMap()[n.getKey()] = n;
-                return this._addValueToNode(n, values.splice(1));
-            }
+        }
+        if (this._getFirstLevelMap()[firstKey]) {
+            const firstNode = this.first_level_map[firstKey];
+            return this._addValueToNode(firstNode, values.splice(1));
+        } else {
+            const newNode = new Node(firstKey);
+            this.first_level_map[newNode.getKey()] = newNode;
+            return this._addValueToNode(newNode, values.splice(1));
         }
     }
 
@@ -140,8 +128,7 @@ class Trie {
                  */
                 delimiter = '';
             }
-        }
-        else {
+        } else {
             delimiter = '';
         }
         return _.trim(prefix + delimiter + key);
@@ -153,7 +140,7 @@ class Trie {
             return result;
         }
         const keys = _.keys(node.getMap());
-        _.each(keys, (key) => {
+        _.each(keys, key => {
             if (node.getNode(key).getWordMark()) {
                 result.push(this._getText(prefix, key));
             }
@@ -170,18 +157,16 @@ class Trie {
             }
             return this._getAllNextValues(result, node, prefix);
         }
-        let key = values[0];
-        let nextNode = node.getNode(key);
+        const key = values[0];
+        const nextNode = node.getNode(key);
         if (nextNode) {
             if (nextNode.isLeaf()) {
                 result.push(this._getText(prefix, key));
                 return result;
-            }
-            else {
+            } else {
                 return this.getNearMatch(result, nextNode, values.splice(1), this._getText(prefix, key));
             }
-        }
-        else {
+        } else {
             return result;
         }
     }
@@ -197,47 +182,37 @@ class Trie {
             const delimiter = this._getDelimiter();
             if (delimiterType === CONSTANT.COUNT_MATCH) {
                 values = this._splitByCount(value, delimiter);
-            }
-            else if (delimiterType === CONSTANT.STR_MATCH) {
+            } else if (delimiterType === CONSTANT.STR_MATCH) {
                 values = value.split(delimiter);
             }
             firstKey = values[0];
-            if (this._getFirstLevelMap()[firstKey]) {
-                let result = this.getNearMatch([], this._getFirstLevelMap()[firstKey], values.splice(1), firstKey);
-                return result.sort(this._lexi);
-            }
-            else {
-                return [];
-            }
-        }
-        else {
+        } else {
             values = value.split('');
             firstKey = values[0];
-            if (this._getFirstLevelMap()[firstKey]) {
-                let result = this.getNearMatch([], this._getFirstLevelMap()[firstKey], values.splice(1), firstKey);
-                return result.sort(this._lexi);
-            }
-            else {
-                return [];
-            }
+        }
+        if (this._getFirstLevelMap()[firstKey]) {
+            const result = this.getNearMatch([], this._getFirstLevelMap()[firstKey], values.splice(1), firstKey);
+            return result.sort(this._lexi);
+        } else {
+            return [];
         }
     }
 
     /**
      * expects array of strings to be added to trie
-     * @param ele
+     * @param elements
      */
-    addAll(ele) {
-        if (_.isEmpty(ele)) {
+    addAll(elements) {
+        if (_.isEmpty(elements)) {
             return;
         }
-        _.each(ele, (e) => {
-            this.add(e);
+        _.each(elements, ele => {
+            this.add(ele);
         });
     }
 
-    _lexi(a, b) {
-        return a.toString().localeCompare(b);
+    _lexi(curr, next) {
+        return curr.toString().localeCompare(next);
     }
 }
 
