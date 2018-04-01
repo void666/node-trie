@@ -5,6 +5,7 @@ class Node {
         this.key = key;
         this.mark_word = false;
         this.map = {};
+        this.dependency = 0;
     }
 
     getNode(key) {
@@ -27,12 +28,28 @@ class Node {
         this.mark_word = true;
     }
 
+    unMarkWord() {
+        this.mark_word = false;
+    }
+
     getWordMark() {
         return this.mark_word;
     }
 
     getMap() {
         return this.map;
+    }
+
+    increaseDependency() {
+        this.dependency += 1;
+    }
+
+    decreaseDependency() {
+        this.dependency -= 1;
+    }
+
+    getDependency() {
+        return this.dependency;
     }
 
 }

@@ -56,6 +56,7 @@ class Trie {
     _addValueToNode(node, values) {
         if (_.isEmpty(values)) {
             node.markWord();
+            node.increaseDependency();
             return;
         }
         if (node.getNode(values[0])) {
@@ -152,6 +153,10 @@ class Trie {
         }
     }
 
+    _removeValue(node, values) {
+
+    }
+
     nearMatch(value) {
         if (_.isEmpty(value)) {
             return [];
@@ -192,7 +197,60 @@ class Trie {
         });
     }
 
-    /** ***************************************************************
+    /**
+     * removes a particular string
+     * @param value
+     * @return {*}
+     */
+
+    remove(value) {
+        if (_.isEmpty(value)) {
+            return;
+        }
+        value = _.toLower(value);
+        let values = [];
+        let firstKey;
+        if (this._hasDelimiter()) {
+            const delimiterType = this._getDelimiterType();
+            const delimiter = this._getDelimiter();
+            if (delimiterType === CONSTANT.COUNT_MATCH) {
+                values = this._splitByCount(value, delimiter);
+            } else if (delimiterType === CONSTANT.STR_MATCH) {
+                values = value.split(delimiter);
+            }
+            firstKey = values[0];
+        } else {
+            values = value.split('');
+            firstKey = values[0];
+        }
+        if (this._getFirstLevelMap()[firstKey]) {
+            const firstNode = this.first_level_map[firstKey];
+            if (firstNode.isLeaf()) {
+                firstNode.unMarkWord();
+                return;
+            }
+            return this._removeValue(firstNode, values.splice(1));
+        } else {
+            return;
+        }
+    }
+
+    /**
+     *
+     * @param values
+     */
+    removeAll(values) {
+    }
+
+    /**
+     * re-instantiates the trie
+     */
+
+    clear() {
+
+    }
+
+    /*****************************************************************
      * utilities
      *****************************************************************/
 
@@ -213,6 +271,7 @@ class Trie {
     _lexi(curr, next) {
         return curr.toString().localeCompare(next);
     }
+
 }
 
 module.exports = Trie;
