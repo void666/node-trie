@@ -60,16 +60,10 @@ class Trie {
             return;
         }
         if (node.getNode(values[0])) {
-            if (values.length === 1) {
-                node.getNode(values[0]).markWord();
-            }
             return this._addValueToNode(node.getNode(values[0]), values.splice(1));
         } else {
             const newNode = new Node(values[0]);
             node.setNode(newNode);
-            if (values.length === 1) {
-                newNode.markWord();
-            }
             return this._addValueToNode(newNode, values.splice(1));
         }
     }
@@ -154,7 +148,19 @@ class Trie {
     }
 
     _removeValue(node, values) {
-
+        // console.log(JSON.stringify(node), values);
+        if (_.isEmpty(values)) {
+            if (node.getWordMark()) {
+                if (node.getDependency() === 1) {
+                    node.unMarkWord();
+                }
+                return node.decreaseDependency();
+            }
+        }
+        const nextKey = values[0];
+        if (node.getNode(nextKey)) {
+            return this._removeValue(node.getNode(nextKey), values.splice(1));
+        }
     }
 
     nearMatch(value) {
@@ -182,6 +188,24 @@ class Trie {
         } else {
             return [];
         }
+    }
+
+    /**
+     *  expects array of strings to be searched in trie
+     *  returns the result in order of entry of strings, Unique values.
+     * @param values
+     * @return {Array}
+     */
+
+    nearMatchAll(values) {
+        if (_.isEmpty(values)) {
+            return [];
+        }
+        let result = [];
+        _.each(values, value => {
+            result = result.concat(this.nearMatch(value));
+        });
+        return _.uniq(result);
     }
 
     /**
@@ -225,14 +249,9 @@ class Trie {
         }
         if (this._getFirstLevelMap()[firstKey]) {
             const firstNode = this.first_level_map[firstKey];
-            if (firstNode.isLeaf()) {
-                firstNode.unMarkWord();
-                return;
-            }
             return this._removeValue(firstNode, values.splice(1));
-        } else {
-            return;
         }
+        return;
     }
 
     /**
@@ -240,14 +259,12 @@ class Trie {
      * @param values
      */
     removeAll(values) {
-    }
-
-    /**
-     * re-instantiates the trie
-     */
-
-    clear() {
-
+        if (_.isEmpty(values)) {
+            return;
+        }
+        _.each(values, value => {
+            this.remove(value);
+        });
     }
 
     /*****************************************************************
@@ -274,4 +291,5 @@ class Trie {
 
 }
 
-module.exports = Trie;
+module
+    .exports = Trie;
