@@ -1,6 +1,6 @@
 {
   "name": "trie-d",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Minimal trie datastructure representation",
   "main": "index.js",
   "scripts": {
