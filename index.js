@@ -26,7 +26,7 @@ class Trie {
                 } else {
                     Error.invalidDelimiter(delimiter);
                 }
-            } else if (typeof delimiter === 'string') {
+            } else {
                 this.delimiter = delimiter.toString();
                 this.delimeter_type = CONSTANT.STR_MATCH;
             }
@@ -80,7 +80,7 @@ class Trie {
             const delimiter = this._getDelimiter();
             if (delimiterType === CONSTANT.COUNT_MATCH) {
                 values = this._splitByCount(value, delimiter);
-            } else if (delimiterType === CONSTANT.STR_MATCH) {
+            } else {
                 values = value.split(delimiter);
             }
             firstKey = values[0];
@@ -115,7 +115,6 @@ class Trie {
     }
 
     _getAllNextValues(result, node, prefix) {
-        // console.log('_getAllNextValues', result, node, prefix);
         if (node.isLeaf()) {
             return result;
         }
@@ -129,8 +128,8 @@ class Trie {
         return result;
     }
 
+
     _getNearMatch(result, node, values, prefix) {
-        // console.log('_getNearMatch', result, node, values, prefix);
         if (_.isEmpty(values)) {
             if (node.getWordMark()) {
                 result.push(this._getText(prefix));
@@ -149,8 +148,11 @@ class Trie {
 
     _removeValue(node, values) {
         // console.log(JSON.stringify(node), values);
+        /* istanbul ignore else */
         if (_.isEmpty(values)) {
+            /* istanbul ignore else */
             if (node.getWordMark()) {
+                /* istanbul ignore else */
                 if (node.getDependency() === 1) {
                     node.unMarkWord();
                 }
@@ -158,6 +160,7 @@ class Trie {
             }
         }
         const nextKey = values[0];
+        /* istanbul ignore else */
         if (node.getNode(nextKey)) {
             return this._removeValue(node.getNode(nextKey), values.splice(1));
         }
@@ -174,11 +177,12 @@ class Trie {
             const delimiter = this._getDelimiter();
             if (delimiterType === CONSTANT.COUNT_MATCH) {
                 values = this._splitByCount(value, delimiter);
-            } else if (delimiterType === CONSTANT.STR_MATCH) {
+            } else {
                 values = value.split(delimiter);
             }
             firstKey = values[0];
-        } else {
+        }
+        else {
             values = value.split('');
             firstKey = values[0];
         }
@@ -239,7 +243,9 @@ class Trie {
             const delimiter = this._getDelimiter();
             if (delimiterType === CONSTANT.COUNT_MATCH) {
                 values = this._splitByCount(value, delimiter);
-            } else if (delimiterType === CONSTANT.STR_MATCH) {
+
+            }
+            else {
                 values = value.split(delimiter);
             }
             firstKey = values[0];
@@ -247,6 +253,7 @@ class Trie {
             values = value.split('');
             firstKey = values[0];
         }
+        /* istanbul ignore else */
         if (this._getFirstLevelMap()[firstKey]) {
             const firstNode = this.first_level_map[firstKey];
             return this._removeValue(firstNode, values.splice(1));

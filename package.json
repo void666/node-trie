@@ -1,6 +1,6 @@
 {
   "name": "trie-d",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Minimal trie datastructure representation",
   "main": "index.js",
   "scripts": {
@@ -27,12 +27,23 @@
     "auto complete",
     "near match",
     "search",
+    "hashmatch",
     "node-trie",
     "trie-search",
     "keywords-search",
     "dynamic trie",
     "word search",
-    "word"
+    "word",
+    "autocomplete",
+    "autosearch",
+    "fuzzymatch",
+    "fuzzy",
+    "match",
+    "typeahead",
+    "ahead",
+    "hash",
+    "map",
+    "hashtable"
   ],
   "devDependencies": {
     "chai": "^4.1.2",
