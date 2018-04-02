@@ -3,7 +3,7 @@
 #### [npm : trie-d](https://www.npmjs.com/package/trie-d)
 [![npm version](https://badge.fury.io/js/trie-d.svg)](https://badge.fury.io/js/trie-d)
 [![coverage](https://coveralls.io/repos/github/void666/node-trie/badge.svg?branch=master)](https://coveralls.io/github/void666/node-trie?branch=master)
-[![build status](https://travis-ci.org/void666/node-trie?branch=master)](https://travis-ci.org/void666/node-trie)
+[![build status](https://travis-ci.org/void666/node-trie.svg?branch=master)](https://travis-ci.org/void666/node-trie)
 [![downloads](https://img.shields.io/npm/dt/trie-d.svg)](https://www.npmjs.com/package/trie-d)
 [![downloads monthly](https://img.shields.io/npm/dm/trie-d.svg)](https://www.npmjs.com/package/trie-d)
 

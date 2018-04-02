@@ -181,8 +181,7 @@ class Trie {
                 values = value.split(delimiter);
             }
             firstKey = values[0];
-        }
-        else {
+        } else {
             values = value.split('');
             firstKey = values[0];
         }
@@ -244,8 +243,7 @@ class Trie {
             if (delimiterType === CONSTANT.COUNT_MATCH) {
                 values = this._splitByCount(value, delimiter);
 
-            }
-            else {
+            } else {
                 values = value.split(delimiter);
             }
             firstKey = values[0];
